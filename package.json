@@ -6,15 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "ava.lmao",
+  "author": "azphina",
   "license": "WTFPL",
   "dependencies": {
     "canvas": "^3.1.0",
     "cli-progress": "^3.12.0",
     "decode-gif": "^1.0.1",
     "ptlangpacker": "file:"
-  },
-  "devDependencies": {
-    "caxa": "^3.0.1"
   }
 }

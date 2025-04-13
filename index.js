@@ -171,7 +171,7 @@ async function beginExecution() {
   config = await getConfig();
   const directories = await getDirectories("./");
   for (let directory of directories) {
-    if (directory != "node_modules" && directory != "export") {
+    if (directory != "node_modules" && directory != "export" && directory != "default" && !directory.startsWith('.')) {
       await packAndExport(directory, config);
     }
   }
