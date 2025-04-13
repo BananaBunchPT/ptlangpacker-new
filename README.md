@@ -15,8 +15,8 @@ Create a new folder (with the exception of reserved `export` and `default`) in t
 ## config.json
 Simple to follow, I hope. Entries are in the following format:
 ```json
-"spritename": {"x": ${xoffset}, "y": ${yoffset}}
+"spritename": {"x": 0, "y": 0}
 ```
-where the placeholders xoffset and yoffset are the sprite offsets within GameMaker. Offsets for sprites replaced in the Language Update are already included.
+where x and y are the sprite's offsets within GameMaker. Offsets for sprites replaced in the Language Update are already included.
 
 `default` is the object all languages load from by default. If for any reason an override, create a new object. `ie` is included as example.
