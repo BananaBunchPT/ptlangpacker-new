@@ -39,56 +39,55 @@ async function packAndExport(texturename, config) {
   let r2 = texturesToPack.length;
   bar1.start(r2, 0);
   for (i = 0; i < r2; i++) {
-    if (texturesToPack[i] != ".DS_Store") {
-      let offset = { x: 0, y: 0 };
-      if (config.default != undefined) {
-        if (config.default[texturesToPack[i].split(".")[0]] != undefined)
-          offset = config.default[texturesToPack[i].split(".")[0]];
-      }
-      if (config[texturename] != undefined) {
-        if (config[texturename][texturesToPack[i].split(".")[0]] != undefined)
-          offset = config[texturename][texturesToPack[i].split(".")[0]];
-      }
-      //FUCK YOU APPLE
-      let imgPath = await fs.promises.readFile(
-        "./" + texturename + "/" + texturesToPack[i]
-      );
-      let img = new canvas.Image();
-      img.src = imgPath;
-      let frames = [];
-      switch (texturesToPack[i].split(".")[1]) {
-        case "png":
-        case "jpeg":
-        case "jfif":
-        case "webp":
-        case "bmp":
-        case "ico":
-          frames = [
-            await exportFrame(
-              img,
-              texturesToPack[i].split(".")[0],
-              texturename,
-              offset
-            ),
-          ];
-          break;
-        case "gif":
-          frames = await getGifFrames(
-            imgPath,
+    let offset = { x: 0, y: 0 };
+    if (config.default != undefined) {
+      if (config.default[texturesToPack[i].split(".")[0]] != undefined)
+        offset = config.default[texturesToPack[i].split(".")[0]];
+    }
+    if (config[texturename] != undefined) {
+      if (config[texturename][texturesToPack[i].split(".")[0]] != undefined)
+        offset = config[texturename][texturesToPack[i].split(".")[0]];
+    }
+    //FUCK YOU APPLE
+    let imgPath = await fs.promises.readFile(
+      "./" + texturename + "/" + texturesToPack[i]
+    );
+    let img = new canvas.Image();
+    img.src = imgPath;
+    let frames = [];
+    switch (texturesToPack[i].split(".")[1]) {
+      case "png":
+      case "jpeg":
+      case "jfif":
+      case "webp":
+      case "bmp":
+      case "ico":
+        frames = [
+          await exportFrame(
+            img,
             texturesToPack[i].split(".")[0],
             texturename,
             offset
-          );
-          break;
-        default:
-          continue;
-      }
-      struct.sprites.push({
-        name: texturesToPack[i].split(".")[0],
-        frames: frames,
-      });
-      bar1.update(i + 1);
+          ),
+        ];
+        break;
+      case "gif":
+        frames = await getGifFrames(
+          imgPath,
+          texturesToPack[i].split(".")[0],
+          texturename,
+          offset
+        );
+        break;
+      default:
+        continue;
     }
+    struct.sprites.push({
+      name: texturesToPack[i].split(".")[0],
+      frames: frames,
+    });
+    bar1.update(i + 1);
+
   }
   for (v = 0; v < packer.bins.length; v++) {
     const rects = packer.bins[v].rects;
