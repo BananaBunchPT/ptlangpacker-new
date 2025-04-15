@@ -140,7 +140,7 @@ async function exportFrame(img, name, texturename, offset) {
           },
           width: rect.width,
           height: rect.height,
-          frameOrder: name.includes("@") ? name.split("@")[1] - 1 : 0,
+          frameOrder: name.includes("@") ? name.split("@")[1] : 0,
           crop_x: trimmed.margins.left,
           crop_y: trimmed.margins.top,
         };
