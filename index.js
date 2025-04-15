@@ -30,7 +30,7 @@ let config = undefined;
 
 async function packAndExport(texturename, config) {
   console.log("\x1b[36mPacking language - " + texturename);
-  const bar1 = new cliProgress.SingleBar({barCompleteString: '|'}, barformat);
+  const bar1 = new cliProgress.SingleBar({ barCompleteString: '|' }, barformat);
   packer = new MaxRectsPacker(2048, 2048, 0, options);
 
   let struct = { sprites: [] };
@@ -50,10 +50,10 @@ async function packAndExport(texturename, config) {
           offset = config[texturename][texturesToPack[i].split(".")[0]];
       }
       //FUCK YOU APPLE
-      var imgPath = await fs.promises.readFile(
+      let imgPath = await fs.promises.readFile(
         "./" + texturename + "/" + texturesToPack[i]
       );
-      var img = new canvas.Image();
+      let img = new canvas.Image();
       img.src = imgPath;
       let frames = [];
       switch (texturesToPack[i].split(".")[1]) {
@@ -80,6 +80,8 @@ async function packAndExport(texturename, config) {
             offset
           );
           break;
+        default:
+          continue;
       }
       struct.sprites.push({
         name: texturesToPack[i].split(".")[0],
@@ -103,7 +105,7 @@ async function packAndExport(texturename, config) {
       );
     }
     const buffer = exportCanvas.toBuffer("image/png");
-    if (!fs.existsSync('./export')){
+    if (!fs.existsSync('./export')) {
       fs.mkdirSync('./export');
     }
     else {
@@ -155,7 +157,7 @@ async function getGifFrames(img, name, texturename, offset) {
   let frames = gifFrames(img);
   let returnful = [];
   for (l = 0; l < frames.frames.length; l++) {
-    var img2 = new canvas.ImageData(
+    let img2 = new canvas.ImageData(
       frames.frames[l].data,
       frames.width,
       frames.height
@@ -165,17 +167,6 @@ async function getGifFrames(img, name, texturename, offset) {
     );
   }
   return returnful;
-}
-
-async function beginExecution() {
-  config = await getConfig();
-  const directories = await getDirectories("./");
-  for (let directory of directories) {
-    if (directory != "node_modules" && directory != "export" && directory != "default" && !directory.startsWith('.')) {
-      await packAndExport(directory, config);
-    }
-  }
-  console.log('\x1b[32mDone! Enjoy.\x1b[37m')
 }
 
 async function imageToImageData(img) {
@@ -199,59 +190,66 @@ function trimImageData(img) {
   let margin_right = 0;
   let margin_bottom = 0;
 
-  let margin_left_checked = false;
-  let margin_top_checked = false;
-
-  let margin_right_checked = false;
-  let margin_bottom_checked = false;
   //Left Margin
-  for (let z = 0; z < img.width; z++) {
-    let alpha = [];
-    for (let o = 0; o < img.height; o++) {
-      alpha.push(img.data[4 * (img.width * o + z) + 3]);
+  for (let x = 0; x < img.width; x++) {
+    let hasPixels = false;
+    for (let y = 0; y < img.height; y++) {
+      if (img.data[4 * (img.width * y + x) + 3] > 0) {
+        hasPixels = true;
+        break;
+      }
     }
-    if (!alpha.every((val) => val == 0) && !margin_left_checked) {
-      margin_left_checked = true;
-      margin_left = z;
-    }
+    margin_left = x;
+    if (hasPixels)
+      break;
   }
+
   //Right Margin
-  for (let z = img.width - 1; z >= 0; z--) {
-    let alpha = [];
-    for (let o = 0; o < img.height; o++) {
-      alpha.push(img.data[4 * (img.width * o + z) + 3]);
+  for (let x = img.width - 1; x > 0; x--) {
+    let hasPixels = false;
+    for (let y = 0; y < img.height; y++) {
+      if (img.data[4 * (img.width * y + x) + 3] > 0) {
+        hasPixels = true;
+        break;
+      }
     }
-    if (!alpha.every((val) => val == 0) && !margin_right_checked) {
-      margin_right_checked = true;
-      margin_right = img.width - 1 - z;
-    }
+    margin_right = x;
+    if (hasPixels)
+      break;
   }
+
+
   //Top Margin
-  for (let z = 0; z < img.height; z++) {
-    let alpha = [];
-    for (let o = 0; o < img.width; o++) {
-      alpha.push(img.data[4 * (img.width * z + o) + 3]);
+  for (let y = 0; y < img.height; y++) {
+    let hasPixels = false;
+    for (let x = 0; x < img.width; x++) {
+      if (img.data[4 * (img.width * y + x) + 3] > 0) {
+        hasPixels = true;
+        break;
+      }
     }
-    if (!alpha.every((val) => val == 0) && !margin_top_checked) {
-      margin_top_checked = true;
-      margin_top = z;
-    }
+    margin_top = y;
+    if (hasPixels)
+      break;
   }
-  //Right Margin
-  for (let z = img.height - 1; z >= 0; z--) {
-    let alpha = [];
-    for (let o = 0; o < img.width; o++) {
-      alpha.push(img.data[4 * (img.width * z + o) + 3]);
+
+  //Bottom Margin
+  for (let y = img.height - 1; y > 0; y--) {
+    let hasPixels = false;
+    for (let x = 0; x < img.width; x++) {
+      if (img.data[4 * (img.width * y + x) + 3] > 0) {
+        hasPixels = true;
+        break;
+      }
     }
-    if (!alpha.every((val) => val == 0) && !margin_bottom_checked) {
-      margin_bottom_checked = true;
-      margin_bottom = img.height - 1 - z;
-    }
+    margin_bottom = y;
+    if (hasPixels)
+      break;
   }
 
   return {
-    width: img.width - margin_left - margin_right,
-    height: img.height - margin_bottom - margin_top,
+    width: margin_right - margin_left,
+    height: margin_bottom - margin_top,
     margins: {
       left: margin_left,
       right: margin_right,
@@ -261,4 +259,14 @@ function trimImageData(img) {
   };
 }
 
-beginExecution();
+async function main() {
+  config = await getConfig();
+  const directories = await getDirectories("./");
+  for (let directory of directories) {
+    if (directory != "node_modules" && directory != "export" && directory != "default" && !directory.startsWith('.')) {
+      await packAndExport(directory, config);
+    }
+  }
+  console.log('\x1b[32mDone! Enjoy.\x1b[37m')
+}
+main();
