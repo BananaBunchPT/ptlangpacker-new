@@ -104,13 +104,6 @@ async function packAndExport(texturename, config) {
       );
     }
     const buffer = exportCanvas.toBuffer("image/png");
-    if (!fs.existsSync('./export')) {
-      fs.mkdirSync('./export');
-    }
-    else {
-      fs.rmSync('./export', { recursive: true, force: true })
-      fs.mkdirSync('./export');
-    }
     fs.writeFileSync("./export/" + texturename + String(v) + ".png", buffer);
   }
   let json = JSON.stringify(struct);
@@ -259,6 +252,13 @@ function trimImageData(img) {
 }
 
 async function main() {
+  if (!fs.existsSync('./export')) {
+      fs.mkdirSync('./export');
+  }
+  else {
+      fs.rmSync('./export', { recursive: true, force: true })
+      fs.mkdirSync('./export');
+  }
   config = await getConfig();
   const directories = await getDirectories("./");
   for (let directory of directories) {
